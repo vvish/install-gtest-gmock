@@ -1,0 +1,34 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test_install_gtest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install GoogleTest
+        uses: ./
+      - name: Check that GoogleTest is available
+        run: |
+          echo "int main() { return 0; }" > test.cpp
+          g++ test.cpp -lgtest
+  test_install_gtest_with_gmock:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install GoogleTest and GoogleMock
+        uses: ./
+        with:
+          gmock: true
+      - name: Check that GoogleTest and GoogleMock are available
+        run: |
+          echo "int main() { return 0; }" > test.cpp
+          g++ test.cpp -lgtest -lgmock
+

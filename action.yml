@@ -1,0 +1,30 @@
+name: 'Install gtest and gmock'
+description: 'Install the GoogleTest and GoogleMock frameworks (onto Linux runners only)'
+inputs:
+  gmock:
+    description: 'Whether to install the GoogleMock framework'
+    default: false
+runs:
+  using: "composite"
+  steps:
+    - name: 'Check the OS'
+      run: if [ "$RUNNER_OS" != "Linux" ]; then echo "$RUNNER_OS is not supported" && exit 1; fi
+      shell: bash
+    - name: 'Install GoogleTest'
+      run: |
+        sudo apt-get install libgtest-dev
+        cd /usr/src/gtest && sudo cmake CMakeLists.txt && sudo make
+        sudo cp *.a /usr/lib
+        sudo ln -s /usr/lib/libgtest.a /usr/local/lib/libgtest.a
+        sudo ln -s /usr/lib/libgtest_main.a /usr/local/lib/libgtest_main.a
+      shell: bash
+    - name: 'Install GoogleMock if requested'
+      run: |
+        if [ "${{ inputs.gmock }}" == "true" ]
+        then
+          sudo apt-get install google-mock
+          cd /usr/src/gmock && sudo cmake CMakeLists.txt && sudo make
+          sudo cp *.a /usr/lib
+        fi
+      shell: bash
+      
